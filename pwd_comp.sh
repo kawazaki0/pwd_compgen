@@ -1,10 +1,17 @@
 #!/bin/bash
 
-listcontains() {
-  for word in $1; do
-    [[ $word = $2 ]] && return 0
+commonPrefix() {
+  prefix=$1
+  shift
+  res=0
+  for i in $@;
+  do
+    if [ $prefix != "`echo $i | cut -c 1-${#prefix}`" ];
+    then
+      res=$[ $res + 1 ]
+    fi
   done
-  return 1
+  echo $res
 }
 
 pathList=`echo \`pwd\` | sed 's/\//\n/g'`
@@ -17,7 +24,8 @@ do
   for pp in $pathChars;
   do
     pathIter=$pathIter$pp
-    if [ `cd $absolutePath; compgen -d $pathIter | wc -l` == 1 ]; 
+    cd $absolutePath;
+    if [ `compgen -d $pathIter | wc -l` == 1 ] || [ `commonPrefix $p \`compgen -d $pathIter\`` == 0 ];
     then
       break
     fi
