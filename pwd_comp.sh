@@ -13,27 +13,49 @@ commonPrefix() {
   done
   echo $res
 }
-
-pathList=`echo \`pwd\` | sed 's/\//\n/g'`
+# currentPath=`pwd`
+currentPath="/"
+#pathList=`echo $currentPath | sed 's/\//\n/g'`
+# pathList=
+IFS_BAK=$IFS
+IFS='/'
+currentPathArray=($currentPath)
+echo ${#currentPathArray[@]}
+echo "----------"
+echo "pathlist: " $currentPathArray
+echo "-----------"
+IFS=$IFS_BAK
 absolutePath="/"
 result=""
-for p in $pathList;
-do
+
+((n_elements=${#currentPathArray[@]}, max_index=n_elements - 1))
+
+for ((i = 1; i <= max_index; i++)); do
+  p=${currentPathArray[i]}
   pathIter=""
-  pathChars=`echo $p | sed -e 's/\(.\)/\1\n/g'`
-  for pp in $pathChars;
-  do
+  # pathChars=`echo $p | sed -e 's/\(.\)/\1\n/g'`
+  pathChars=$p
+  echo "???${#pathChars}"
+  ((pathCharsLen=${#pathChars}, lenPathChars=pathCharsLen - 1))
+  for ((j = 0; j <= lenPathChars; j++)); do
+    pp=${pathChars:$j:1}
     pathIter=$pathIter$pp
     cd $absolutePath;
-    if [ `compgen -d $pathIter | wc -l` == 1 ] || [ `commonPrefix $p \`compgen -d $pathIter\`` == 0 ];
-    then
+    echo "$p:::$pathIter"
+    echo `compgen -d "$pathIter"`
+    echo "-----------"
+    if [ `compgen -d "$pathIter" -P \" -S \" | wc -l` == 1 ] || [ `commonPrefix \"$p\" \`compgen -d "$pathIter"\` -P \" -S \"` == 0 ];
+      then
       break
     fi
   done
   absolutePath=$absolutePath"$p/"
   result="$result/$pathIter"
+  echo $p
+  echo "**"
 done
-if [ -z $result ]; then
+if [ -z "$result" ]; then
   result="/"
 fi
-echo $result
+echo "+++++++++++++++++"
+echo "$result" | sed 's/ /\\ /g'
