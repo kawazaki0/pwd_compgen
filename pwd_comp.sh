@@ -2,16 +2,18 @@
 
 commonPrefix() {
   prefix=$1
-  shift
+  IFS_BAK=$IFS
+  IFS=$'\n'
   res=0
-  for i in "$@";
+  for i in $(compgen -d "$2");
   do
     if [ "$prefix" != "$(echo "$i" | cut -c 1-${#prefix})" ];
     then
       res=$((res + 1))
     fi
   done
-  echo $res
+  IFS=$IFS_BAK
+  echo "$res"
 }
 currentPath=$(pwd)
 IFS_BAK=$IFS
@@ -32,11 +34,11 @@ for ((i = 1; i <= max_index; i++)); do
     pp=${pathChars:$j:1}
     pathIter=$pathIter$pp
     cd "$absolutePath";
-    if [ "$(compgen -d -P \" -S \" "$pathIter" | wc -l)" == 1 ] || [ "$(commonPrefix "$p" $(compgen -d "$pathIter" -P \" -S \"))" == 0 ]; then
+    if [ "$(compgen -d "$pathIter" | wc -l)" == 1 ] || [ "$(commonPrefix "$p" "$pathIter")" == 0 ]; then
       break
     fi
   done
-  absolutePath=$absolutePath"$p/"
+  absolutePath="$absolutePath$p/"
   result="$result/$pathIter"
 done
 if [ -z "$result" ]; then
