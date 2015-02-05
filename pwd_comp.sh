@@ -4,16 +4,16 @@ commonPrefix() {
   prefix=$1
   shift
   res=0
-  for i in $@;
+  for i in "$@";
   do
-    if [ $prefix != "`echo $i | cut -c 1-${#prefix}`" ];
+    if [ "$prefix" != "$(echo "$i" | cut -c 1-${#prefix})" ];
     then
-      res=$[ $res + 1 ]
+      res=$((res + 1))
     fi
   done
   echo $res
 }
-currentPath=`pwd`
+currentPath=$(pwd)
 IFS_BAK=$IFS
 IFS='/'
 currentPathArray=($currentPath)
@@ -32,8 +32,8 @@ for ((i = 1; i <= max_index; i++)); do
   for ((j = 0; j <= lenPathChars; j++)); do
     pp=${pathChars:$j:1}
     pathIter=$pathIter$pp
-    cd $absolutePath;
-    if [ `compgen -d "$pathIter" -P \" -S \" | wc -l` == 1 ] || [ `commonPrefix \"$p\" \`compgen -d "$pathIter"\` -P \" -S \"` == 0 ];
+    cd "$absolutePath";
+    if [ "$(compgen -d "$pathIter" -P \" -S \" | wc -l)" == 1 ] || [ "$(commonPrefix \"$p\" \`compgen -d "$pathIter"\` -P \" -S \")" == 0 ];
       then
       break
     fi
@@ -44,4 +44,4 @@ done
 if [ -z "$result" ]; then
   result="/"
 fi
-echo "$result" | sed 's/ /\\ /g'
+echo ${result// /\\ }
