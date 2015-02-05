@@ -18,23 +18,21 @@ IFS_BAK=$IFS
 IFS='/'
 currentPathArray=($currentPath)
 IFS=$IFS_BAK
+
 absolutePath="/"
 result=""
 
 ((n_elements=${#currentPathArray[@]}, max_index=n_elements - 1))
-
 for ((i = 1; i <= max_index; i++)); do
   p=${currentPathArray[i]}
   pathIter=""
-  # pathChars=`echo $p | sed -e 's/\(.\)/\1\n/g'`
   pathChars=$p
   ((pathCharsLen=${#pathChars}, lenPathChars=pathCharsLen - 1))
   for ((j = 0; j <= lenPathChars; j++)); do
     pp=${pathChars:$j:1}
     pathIter=$pathIter$pp
     cd "$absolutePath";
-    if [ "$(compgen -d "$pathIter" -P \" -S \" | wc -l)" == 1 ] || [ "$(commonPrefix \"$p\" \`compgen -d "$pathIter"\` -P \" -S \")" == 0 ];
-      then
+    if [ "$(compgen -d -P \" -S \" "$pathIter" | wc -l)" == 1 ] || [ "$(commonPrefix "$p" $(compgen -d "$pathIter" -P \" -S \"))" == 0 ]; then
       break
     fi
   done
@@ -44,4 +42,4 @@ done
 if [ -z "$result" ]; then
   result="/"
 fi
-echo ${result// /\\ }
+echo "${result// /\\ }"
