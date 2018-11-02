@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 commonPrefix() {
   prefix=$1
